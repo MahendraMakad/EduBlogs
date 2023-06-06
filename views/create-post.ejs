@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post</title>
+</head>
+<body>
+    <form>
+        <div>
+            <label for="title">Title</label><br>
+            <input type="text" name="title" id="title">
+        </div>
+        <div>
+            <label for="description">Description</label><br>
+            <textarea name="description" id="description" cols="30" rows="10"></textarea>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
+
+<script>
+    const form = document.querySelector('form');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = form.title.value;
+        const description = form.description.value;
+        try {
+            const response = await fetch('/posts/create/new', {
+                method: 'POST',
+                body: JSON.stringify({
+                    title: title,
+                    description: description,
+                }),
+                headers: {
+                    'Content-Type': 'application/json' // Fix the typo here
+                },
+            });
+            // Handle the response if neede
+            alert("Post created sucessfully");
+            window.location.href = '/'; 
+        } catch (error) {
+            alert("Something went wrong");
+            console.log('Error:', error);
+        }
+    });
+</script>
