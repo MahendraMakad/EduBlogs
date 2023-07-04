@@ -1,1 +1,1 @@
-# EduBlogs---A-Blogging-Website
+# EduBlogs - A Blogging Website
