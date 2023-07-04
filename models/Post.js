@@ -5,6 +5,14 @@ const PostSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    subtitle: {
+        type: String,
+        required:true,
+    },
+    userId: {
+        type: String,
+        required:true,
+    },
     description: {
         type: String,
         default: "",
@@ -15,5 +23,4 @@ const PostSchema = new mongoose.Schema({
     }
 });
 
-const Post = mongoose.model('posts',PostSchema);
-module.exports = Post
+mongoose.model('posts',PostSchema);

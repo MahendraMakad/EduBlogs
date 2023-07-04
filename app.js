@@ -1,26 +1,47 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const connectDB = require('./config/db');
-const Post = require('./models/Post');
-const postRoute = require('./routes/post')
-const app = express()
+const express = require("express");
+const connectDB = require("./config/db");
+const session = require("express-session");
+const MongoStore = require("connect-mongo")(session);
+const mongoose = require("mongoose");
+const passport = require("passport");
 
-app.use(express.json());
-app.use('/posts',postRoute);
-app.set("view engine","ejs");
+require("./models/User");
+require("./models/Post");
+require("./models/Comment");
+
+const app = express();
+
 connectDB();
+require("./config/passport");
 
-app.get('/',async (req,res)=>{
-    try {
-        const posts = await Post.find({});
-        res.render('all-posts',{posts});
-    }
-    catch(error) {
-        console.log("error");
-        res.status(500).json({"message":"Server Error"});
-    }
-})
+app.set("view engine", "ejs");
+
+app.use(express.static("public"));
+app.use(express.json());
+
+app.use(
+  session({
+    secret: "mysecretkey",
+    resave: false,
+    saveUninitialized: true,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use("/auth", require("./routes/auth"));
+app.use("/", require("./routes/index"));
+app.use("/", require("./routes/profile"));
+app.use("/", require("./routes/post"));
+app.use("/", require("./routes/comment"));
+app.use("/", require("./routes/upload"));
+
+app.get("/*", (req, res) => {
+  res.render("error-404");
+});
 
 app.listen(3000, () => {
-    console.log("Server is running on Port 3000");
+  console.log("Server is running on Port 3000");
 });

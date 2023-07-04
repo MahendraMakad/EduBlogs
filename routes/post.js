@@ -1,24 +1,75 @@
-const express = require("express")
-const { default: mongoose } = require("mongoose")
-const router = express.Router()
-const Post = mongoose.model('posts');
+const express = require("express");
+const mongoose = require("mongoose");
+const moment = require("moment");
 
-router.get("/create/new", (req, res) => {
-    res.render("create-post")
-})
+const { ensureAuth } = require("../middleware/auth");
+const { ensureSignUp, ensureCreator } = require("../middleware/user");
 
-router.post("/create/new", async (req, res) => {
+const Post = mongoose.model("posts");
+const User = mongoose.model("users");
+const Comment = mongoose.model("comments");
+
+const router = express.Router();
+
+router.get(
+  "/create/post",
+  ensureAuth,
+  ensureSignUp,
+  ensureCreator,
+  (req, res) => {
+    res.render("create-post");
+  }
+);
+
+router.post(
+  "/create/post",
+  ensureAuth,
+  ensureSignUp,
+  ensureCreator,
+  async (req, res) => {
     try {
-        const { title, description } = req.body;
-        const post = await Post.create({
-            title, description
-        })
-        res.send(post);
+      const user = req.user;
+      const post = await Post.create({
+        ...req.body,
+        userId: user._id,
+      });
+      console.log(post);
+
+      res.status(200).send(post);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        error: "Something went wrong",
+      });
     }
-    catch(error) {
-        console.log("Error:",error);
-        res.status(500).json({"message":"server error"});
+  }
+);
+
+router.get("/post/:id", ensureAuth, async (req, res) => {
+    const postID = req.params.id;
+    try {
+      const post = await Post.findById(postID);
+      console.log("post found");
+      if (!post) {
+        return res.redirect("/post-not-found");
+      }
+      const author = await User.findById(post.userId);
+      const postDate = moment(post.createdAt).format("dddd, MMMM Do YYYY");
+  
+      const comments = await Comment.find({ postID: postID, depth:1 });
+      console.log("comments:");
+      console.log(comments);
+      res.locals.post = post;
+      res.locals.comments = comments;
+      res.locals.author = author;
+      res.locals.postDate = postDate;
+  
+      res.render("post");
+    } catch (error) {
+      console.log(error);
+      res.render("error-500");
     }
-})
+  });
+  
 
 module.exports = router;
