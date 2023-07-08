@@ -8,7 +8,7 @@ passport.use(
         {
             clientID: '343960282758-p0baen1tn48p0eofql1nklh5idck7i4f.apps.googleusercontent.com',
             clientSecret: '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',
-            callbackURL: 'http://localhost:3000/auth/google/callback',
+            callbackURL: '/auth/google/callback',
         },
         async (accessToken,refreshToken,profile,done) => {
             const newUser = {
