@@ -6,8 +6,8 @@ const { v4: uuid } = require("uuid");
 const bucket = new S3Client({
     region: "ap-south-1",
     credentials: {
-        accessKeyId: "AKIA2QFDA72GA4ECYX3H",
-        secretAccessKey: "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"
+        accessKeyId: "AKIA2QFDA72GKAEC7MTM",
+        secretAccessKey: "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"
     }
 });
 
